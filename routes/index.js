@@ -38,7 +38,7 @@ module.exports =  function (app, passport) {
     app.get('/welcome', function(req, res, next){
 
             res.render('welcome', {
-                user : req.user
+                username : req.username
             });
 
     });
