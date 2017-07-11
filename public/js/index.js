@@ -18,8 +18,8 @@ socket.on('chat', function ( msg) {
 });
 
 
-socket.on('updatechat', function (username, data) {
-    $('#username').append($('<p>').text(  username + ' has connected'));
+socket.on('updatechat', function (username, room) {
+    $('#username').append($('<p>').text(  username + ' has connected to ' +  room));
 });
 
 socket.on('updaterooms', function(rooms, current_room){

@@ -84,9 +84,18 @@ var rooms = ['room1','room2','room3'];
 
 io.on('connection', function(socket){
     console.log('user', socket.request.user.username + ' has connected');
-    const connectedClientsForUser = passportSocketIo.filterSocketsByUser(io, user => user === socket.request.user);
 
-    console.log('connectedClientsForUser length', connectedClientsForUser.length);
+    mongo.connect(process.env.CUSTOMCONNSTR_MONGOLAB_URI, function(err, db){
+        var collection = db.collection('chat_messages');
+        var stream = collection.find({}).sort({"time": -1}).limit(10).stream();
+
+        stream.on('data', function (chat) {
+            socket.emit('chat', chat.content);
+        });
+
+    });
+
+
 
     socket.on('adduser', function(){
 
@@ -97,22 +106,21 @@ io.on('connection', function(socket){
         usernames[username] = username;
         socket.join('room1');
 
-        socket.emit('updatechat', socket.request.user.username, ' you have connected to room1');
-        socket.broadcast.to('room1').emit('updatechat',  socket.request.user.username);
+        socket.emit('updatechat', socket.request.user.username,  socket.room);
+        socket.broadcast.to('room1').emit('updatechat',  socket.request.user.username, socket.room);
         socket.emit('updaterooms', rooms, 'room1');
 
-        socket.in('room1').emit('foot', 'bar')
 
        // socket.broadcast.emit('updatechat', socket.request.user.username + ' has connected');
     } );
 
     socket.on('switchRoom', function(newroom){
-        console.log("new room: ", newroom);
         socket.leave(socket.room);
         socket.join(newroom);
-        socket.emit('updatechat', socket.request.user.username, ' you have connected to ' + newroom);
+        socket.emit('updatechat', socket.request.user.username,  newroom);
+        socket.broadcast.to(newroom).emit('updatechat',  socket.request.user.username, newroom);
         //send message to old room
-        socket.broadcast.to(socket.room)
+        socket.broadcast.to(socket.room);
     })
 
 
@@ -127,7 +135,7 @@ io.on('connection', function(socket){
         mongo.connect(process.env.CUSTOMCONNSTR_MONGOLAB_URI, function(err, db){
             var collection = db.collection('chat_messages');
             var stream = collection.find().sort().limit(10).stream();
-            stream.on('data', function (chat) { socket.emit('chat', chat.content); });
+
             collection.insert({'content': msg, 'user': socket.request.user.username, 'time': Date.now() }, function(err, o){
                 if(err) {
                     console.warn(err.message);
@@ -138,7 +146,8 @@ io.on('connection', function(socket){
 
 
         });
-        socket.broadcast.emit('chat',  msg);
+       // socket.broadcast.emit('chat',  msg);
+        socket.broadcast.to(socket.room).emit('chat',  msg);
     });
 
 
