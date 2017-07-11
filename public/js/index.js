@@ -13,12 +13,12 @@ socket.on('connect', function() {
     socket.emit('create', 'business');
     socket.emit('adduser');
 });
-socket.on('chat', function ( msg) {
-    $('#messages').append($('<p>').text(  msg));
+socket.on('chat', function ( msg, username) {
+    $('#messages').append('<b>' + username + ':</b> '+ msg + '<br>');
 });
 
 
-socket.on('updatechat', function (username, room) {
+socket.on('addedUser', function (username, room) {
     $('#username').append($('<p>').text(  username + ' has connected to ' +  room));
 });
 
@@ -33,6 +33,13 @@ socket.on('updaterooms', function(rooms, current_room){
         });
     });
 
+socket.on('updateusers', function(usernames){
+    // code for showing the current users.
+});
+
+socket.on('updatechat', function(data, username){
+    $('#messages').append('<b>' + username + ':</b> '+ msg + '<br>');
+})
 
 function switchRoom(room){
     $('#roomname').append('<h1' + room + '</h1>')

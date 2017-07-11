@@ -90,24 +90,24 @@ io.on('connection', function(socket){
         var stream = collection.find({}).sort({"time": -1}).limit(10).stream();
 
         stream.on('data', function (chat) {
-            socket.emit('chat', chat.content);
+            socket.emit('chat', chat.content, chat.user);
         });
 
     });
 
-
-
     socket.on('adduser', function(){
 
         var username = socket.request.user.username;
-
         socket.username = socket.request.user.username;
         socket.room = 'room1';
-        usernames[username] = username;
+        usernames[username] = socket.username;
         socket.join('room1');
 
-        socket.emit('updatechat', socket.request.user.username,  socket.room);
-        socket.broadcast.to('room1').emit('updatechat',  socket.request.user.username, socket.room);
+        socket.emit('addedUser', socket.request.user.username,  socket.room);
+        socket.broadcast.to('room1').emit('addedUser',  socket.request.user.username, socket.room);
+
+       // socket.emit('updatechat', socket.request.user.username,  socket.room);
+       // socket.broadcast.to('room1').emit('addedUser',  socket.request.user.username, socket.room);
         socket.emit('updaterooms', rooms, 'room1');
 
 
@@ -117,8 +117,8 @@ io.on('connection', function(socket){
     socket.on('switchRoom', function(newroom){
         socket.leave(socket.room);
         socket.join(newroom);
-        socket.emit('updatechat', socket.request.user.username,  newroom);
-        socket.broadcast.to(newroom).emit('updatechat',  socket.request.user.username, newroom);
+        socket.emit('addedUser', socket.request.user.username,  newroom);
+        socket.broadcast.to(newroom).emit('addedUser',  socket.request.user.username, newroom);
         //send message to old room
         socket.broadcast.to(socket.room);
     })
@@ -127,6 +127,9 @@ io.on('connection', function(socket){
 
     socket.on('disconnect', function () {
         console.log('user disconnected');
+        delete usernames[socket.request.user.username];
+       socket.emit('updateusers', usernames);
+
     });
 
 
@@ -147,8 +150,13 @@ io.on('connection', function(socket){
 
         });
        // socket.broadcast.emit('chat',  msg);
-        socket.broadcast.to(socket.room).emit('chat',  msg);
+        var username = socket.request.user.username;
+        socket.broadcast.to(socket.room).emit('chat',  msg, username );
     });
+
+    socket.on('sendchat', function(data){
+        socket.in(socket.room).emit('updatechat',  data, socket.request.user.username);
+    })
 
 
 
