@@ -61,7 +61,7 @@ io.use(passportSocketIo.authorize({
     store: sessionStore,
     cookieParser: require('cookie-parser'),
     success: function(data, accept) {
-        console.log('successful connection to socket.io');
+
         accept(null, true);
     },
     fail: function(data, message, error, accept)  {
@@ -76,14 +76,46 @@ io.use(passportSocketIo.authorize({
     }
 }))
 
+// usernames which are currently connected to the chat
+var usernames = {};
+
+// rooms which are currently available in chat
+var rooms = ['room1','room2','room3'];
 
 io.on('connection', function(socket){
     console.log('user', socket.request.user.username + ' has connected');
+    const connectedClientsForUser = passportSocketIo.filterSocketsByUser(io, user => user === socket.request.user);
+
+    console.log('connectedClientsForUser length', connectedClientsForUser.length);
 
     socket.on('adduser', function(){
-        socket.emit('updatechat', socket.request.user.username);
-        socket.broadcast.emit('updatechat', socket.request.user.username + ' has connected');
-    } )
+
+        var username = socket.request.user.username;
+
+        socket.username = socket.request.user.username;
+        socket.room = 'room1';
+        usernames[username] = username;
+        socket.join('room1');
+
+        socket.emit('updatechat', socket.request.user.username, ' you have connected to room1');
+        socket.broadcast.to('room1').emit('updatechat',  socket.request.user.username);
+        socket.emit('updaterooms', rooms, 'room1');
+
+        socket.in('room1').emit('foot', 'bar')
+
+       // socket.broadcast.emit('updatechat', socket.request.user.username + ' has connected');
+    } );
+
+    socket.on('switchRoom', function(newroom){
+        console.log("new room: ", newroom);
+        socket.leave(socket.room);
+        socket.join(newroom);
+        socket.emit('updatechat', socket.request.user.username, ' you have connected to ' + newroom);
+        //send message to old room
+        socket.broadcast.to(socket.room)
+    })
+
+
 
     socket.on('disconnect', function () {
         console.log('user disconnected');
