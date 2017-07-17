@@ -1,3 +1,4 @@
+var Messages  = require('../models/messages');
 
 module.exports =  function (app, passport) {
    // app.get('/', function(req, res, next){
@@ -18,16 +19,6 @@ module.exports =  function (app, passport) {
         res.render('login', { message: req.flash('loginMessage') });
     })
 
-    // app.post('/login', function(req, res, next){
-    //     if(req.body.username && req.body.username === 'user' && req.body.password && req.body.password === 'pass'){
-    //         req.session.authenticated = true;
-    //         req.session.username = req.body.username;
-    //         res.redirect('/welcome');
-    //     }else {
-    //         req.flash('error', 'Username and password are incorrect');
-    //         res.redirect('/unauthorised');
-    //     }
-    // });
 
     app.post('/login', passport.authenticate('login', {
         successRedirect : '/welcome', // redirect to the secure profile section
@@ -45,6 +36,18 @@ module.exports =  function (app, passport) {
     app.get('/unauthorised', function(req, res, next){
              res.render('unauthorised');
         });
+
+    app.get('/retrieveMessagesForRoom', function(req, res, next){
+        console.log("calling retrieveMessagesForRoom" + req.query.room);
+
+        Messages.find({"room": req.query.room}, function(err, data){
+            console.log("hello" , data);
+            res.setHeader('Content-Type', 'application/json');
+            res.send( data);
+
+        });
+
+    })
 
 
 }

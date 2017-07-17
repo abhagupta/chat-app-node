@@ -115,6 +115,8 @@ io.on('connection', function(socket){
     } );
 
     socket.on('switchRoom', function(newroom){
+        console.log('new room' , newroom);
+        socket.room = newroom;
         socket.leave(socket.room);
         socket.join(newroom);
         socket.emit('addedUser', socket.request.user.username,  newroom);
@@ -138,12 +140,13 @@ io.on('connection', function(socket){
         mongo.connect(process.env.CUSTOMCONNSTR_MONGOLAB_URI, function(err, db){
             var collection = db.collection('chat_messages');
             var stream = collection.find().sort().limit(10).stream();
+            console.log('Current room in chat ', socket.room);
 
-            collection.insert({'content': msg, 'user': socket.request.user.username, 'time': Date.now() }, function(err, o){
+            collection.insert({'content': msg, 'user': socket.request.user.username, 'time': Date.now(), 'room': socket.room }, function(err, o){
                 if(err) {
                     console.warn(err.message);
                 } else {
-                    console.log("chat message inserted into db " + msg +  "by user" + socket.request.user.username );
+                    console.log("chat message inserted into db " + msg +  " by user "  + socket.request.user.username + " in room " + socket.room );
                 }
             });
 

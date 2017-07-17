@@ -3,10 +3,13 @@ var socket = io();
 
 $('#send-message-btn').click(function () {
     var msg = $('#message-box').val();
-    socket.emit('chat', msg);
-    $('#messages').append($('<p>').text(msg));
-    $('#message-box').val('');
-    return false;
+    if(msg.length>0){
+        socket.emit('chat', msg);
+        $('#messages').append($('<p>').text(msg));
+        $('#message-box').val('');
+        return false;
+    }
+
 });
 
 socket.on('connect', function() {
@@ -42,7 +45,22 @@ socket.on('updatechat', function(data, username){
 })
 
 function switchRoom(room){
-    $('#roomname').append('<h1' + room + '</h1>')
+    $('#roomname').append('<h1' + room + '</h1>');
+
+    // empty the messages
+    // pull messages for this chat room from database by calling an ajax call
+    $.ajax(
+        {url: "/retrieveMessagesForRoom?room="+room,
+        dataType: 'json',
+         success: function(result){
+             $('#messages').empty();
+             result.forEach(function(message){
+                 $('#messages').append('<b>' + message.user + ':</b> '+ message.content + '<br>');
+             })
+         }
+        }
+     );
+
     socket.emit('switchRoom', room);
 }
 
