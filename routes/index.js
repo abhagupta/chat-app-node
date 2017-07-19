@@ -5,6 +5,10 @@ module.exports =  function (app, passport) {
    //      res.render('index');
    // });
 
+    app.get('/', function(req, res, next){
+        res.redirect('/login');
+    });
+
     app.get('/signup', function(req, res, next){
         res.render('signup', { message: req.flash('signupMessage') });
     });
