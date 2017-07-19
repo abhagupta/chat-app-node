@@ -75,9 +75,7 @@ socket.on('updateusers', function(usernames){
     // code for showing the current users.
 });
 
-// socket.on('updatechat', function(data, username){
-//     $('#messages').append('<b>' + username + ':</b> '+ msg + '<br>');
-// })
+
 
 function switchRoom(room){
     $('#roomname').empty();
