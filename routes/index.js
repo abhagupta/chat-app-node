@@ -27,10 +27,15 @@ module.exports =  function (app, passport) {
     }));
 
     app.get('/welcome', function(req, res, next){
-
+        if(!req.session.passport){
+            res.redirect('/unauthorised');
+        } else {
             res.render('welcome', {
-                username : req.username
+                username : req.user.username
             });
+        }
+
+
 
     });
     app.get('/unauthorised', function(req, res, next){
@@ -38,13 +43,26 @@ module.exports =  function (app, passport) {
         });
 
     app.get('/retrieveMessagesForRoom', function(req, res, next){
-        console.log("calling retrieveMessagesForRoom" + req.query.room);
 
         Messages.find({"room": req.query.room}, function(err, data){
-            console.log("hello" , data);
             res.setHeader('Content-Type', 'application/json');
             res.send( data);
 
+        });
+
+    });
+    app.get('/logout', function(req, res){
+        req.logout();
+        req.session.destroy(function (err) {
+            if (err) {
+                return next(err);
+            }
+
+            // destroy session data
+            req.session = null;
+
+            // redirect to homepage
+            res.redirect('/login');
         });
 
     })

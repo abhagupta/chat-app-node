@@ -1,50 +1,57 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title></title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/stylesheet.css">
     <meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">-->
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.css">
+
 </head>
 <body>
-<div class="wrap">
-    <div class="container-fluid">
-
-        <div class="row">
-            <div class="col-sm-9 col-lg-10">
-                <h1>Welcome to Node chat room </h1>
-                <div class="col-sm-3 col-lg-2">
-                <nav class="navbar navbar-default navbar-fixed-side">
-                    <b>Rooms</b>
-                    <div id="rooms"></div>
-                    <div class="alert alert-apple">
-
-                            <p id="username"></p>
-
+<!--<script src="https://use.fontawesome.com/45e03a14ce.js"></script>-->
+<div class="main_section">
+    <div class="container">
+        <div class="chat_container">
+            <div class="col-sm-3 chat_sidebar">
+                <div class="row">
+                    <div id="custom-search-input">
+                        <div class="input-group col-md-12">
+                           <h3>Rooms</h3>
+                        </div>
                     </div>
-                </nav>
 
-                </div>
-                <div class="col-lg-5 col-lg-12">
-
-                    <div id="messages"></div>
-                    <div class="push"></div>
-                </div>
-
-        </div>
-    </div></div>
-<div class="footer">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-xs-8 col-sm-9">
-                <input type="text" id="message-box" placeholder="Write a message here..." rows="3" class="form-control input-lg">
+                    <div class="member_list">
+                        <ul class="list-unstyled" id="rooms">
+                        </ul>
+                    </div></div>
             </div>
+            <!--chat_sidebar-->
 
-            <div class="col-xs-4 col-sm-3">
-                <button id="send-message-btn" class="btn btn-primary btn-lg btn-block">Send Message</button>
-            </div>
+
+            <div class="col-sm-9 message_section">
+                <div class="row">
+                    <div class="new_message_head">
+                        <div id="roomname" class="pull-left"></div><div class="pull-right"><p>Welcome <%= username%> </p><a href="/logout">Logout</a></div>
+                    </div><!--new_message_head-->
+
+                    <div class="chat_area" id="messages">
+                        <ul class="list-unstyled">
+                        </ul>
+                        <div id="username"></div>
+                    </div><!--chat_area-->
+
+                    <div class="message_write">
+                        <!--<textarea class="form-control" placeholder="type a message"></textarea>-->
+                        <input type="text" id="message-box" placeholder="Write a message here..." rows="3" class="form-control">
+                        <div class="clearfix"></div>
+
+                            <a href="#" class="pull-right btn btn-success" id="send-message-btn">
+                                Send</a></div>
+                    </div>
+                </div>
+            </div> <!--message_section-->
         </div>
     </div>
 </div>
@@ -54,3 +61,4 @@
 </script><script type="text/javascript" src="/socket.io/socket.io.js">
 
 </script></body></html><script type="text/javascript" src="/js/index.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>

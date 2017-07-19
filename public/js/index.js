@@ -1,11 +1,20 @@
 
 var socket = io();
 
+
+
 $('#send-message-btn').click(function () {
     var msg = $('#message-box').val();
     if(msg.length>0){
         socket.emit('chat', msg);
-        $('#messages').append($('<p>').text(msg));
+        $('#messages ul').append('<li class="left clearfix">' +
+            '<span class="chat-img1 pull-left"><img src=""  class="img-circle">' +
+            '</span>' +
+            '<div class="chat-body1 clearfix">' +
+            '<p>' + msg + '</p>' +
+            '<div class="chat_time pull-right">' + moment().format("h:mm:ss a") + '</div>' +
+            '</div>' +
+         '</li>');
         $('#message-box').val('');
         return false;
     }
@@ -16,8 +25,31 @@ socket.on('connect', function() {
     socket.emit('create', 'business');
     socket.emit('adduser');
 });
-socket.on('chat', function ( msg, username) {
-    $('#messages').append('<b>' + username + ':</b> '+ msg + '<br>');
+
+
+socket.on('chat', function ( msg, username, time) {
+    $('#roomname').empty();
+    $('#roomname').append('<p>room1</p>');
+    $.ajax(
+        {url: "/retrieveMessagesForRoom?room=room1",
+            dataType: 'json',
+            success: function(result){
+                $('#messages').empty();
+                var list = $("#messages").append('<ul class="list-unstyled"></ul>').find('ul');
+
+                result.forEach(function(message){
+                    // $('#messages ul').append('<b>' + message.user + ':</b> '+ message.content + '<br>');
+                    list.append('<li class="left clearfix"> <span class="chat-img pull-left"><img src=""  class="img-circle"></img></span>' +
+                        '<div class="chat-body1 clearfix">' +
+                        '<strong>' + message.user + '</strong>' +
+                        '<p>' + message.content + '</p>' +
+                        '<div class="chat_time pull-right">' + moment(message.time).format("dddd, MMMM Do YYYY, h:mm:ss a") + '</div>' +
+                        '</div>' +
+                        '</li>');
+                })
+            }
+        }
+    );
 });
 
 
@@ -28,11 +60,13 @@ socket.on('addedUser', function (username, room) {
 socket.on('updaterooms', function(rooms, current_room){
     $('#rooms').empty();
     $.each(rooms, function(key, value){
-        if(value == current_room){
-            $('#rooms').append('<div' + value + '</div>');
-        }else {
-            $('#rooms').append('<div><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></div>');
-        }
+
+            $('#rooms').append('<li class="left clearfix" <span class="chat-img pull-left">' +
+
+                '</span><div class="chat-body clearfix">' +
+                '<div class="header_sec"> <strong class="primary-font"><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></strong> <strong class="pull-right">'+
+                '</div></li>');
+
         });
     });
 
@@ -40,12 +74,13 @@ socket.on('updateusers', function(usernames){
     // code for showing the current users.
 });
 
-socket.on('updatechat', function(data, username){
-    $('#messages').append('<b>' + username + ':</b> '+ msg + '<br>');
-})
+// socket.on('updatechat', function(data, username){
+//     $('#messages').append('<b>' + username + ':</b> '+ msg + '<br>');
+// })
 
 function switchRoom(room){
-    $('#roomname').append('<h1' + room + '</h1>');
+    $('#roomname').empty();
+    $('#roomname').append('<p>' + room + '</p>');
 
     // empty the messages
     // pull messages for this chat room from database by calling an ajax call
@@ -54,8 +89,17 @@ function switchRoom(room){
         dataType: 'json',
          success: function(result){
              $('#messages').empty();
+             var list = $("#messages").append('<ul class="list-unstyled"></ul>').find('ul');
+
              result.forEach(function(message){
-                 $('#messages').append('<b>' + message.user + ':</b> '+ message.content + '<br>');
+                 // $('#messages ul').append('<b>' + message.user + ':</b> '+ message.content + '<br>');
+                 list.append('<li class="left clearfix"> <span class="chat-img pull-left"><img src=""  class="img-circle"></img></span>' +
+                     '<div class="chat-body1 clearfix">' +
+                     '<strong>' + message.user + '</strong>' +
+                     '<p>' + message.content + '</p>' +
+                     '<div class="chat_time pull-right">' + moment(message.time).format("dddd, MMMM Do YYYY, h:mm:ss a") + '</div>' +
+                     '</div>' +
+                     '</li>');
              })
          }
         }

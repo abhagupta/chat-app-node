@@ -8,11 +8,12 @@ const passportSocketIo = require('passport.socketio');
 var flash = require('connect-flash');
 var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
-// var user = require('./routes/user')
+var user = require('./routes/user')
 mongoose.connect(process.env.CUSTOMCONNSTR_MONGOLAB_URI, {
     useMongoClient: true
 
 });
+
 
 const sessionStore = new MongoStore({mongooseConnection: mongoose.connection});
 
@@ -66,7 +67,7 @@ io.use(passportSocketIo.authorize({
     },
     fail: function(data, message, error, accept)  {
         if (error) {
-            console.log(`error: ${message}`);
+            console.log(`error : ${message}`);
 
             accept(new Error('Unauthorized'));
         } else {
@@ -154,7 +155,7 @@ io.on('connection', function(socket){
         });
        // socket.broadcast.emit('chat',  msg);
         var username = socket.request.user.username;
-        socket.broadcast.to(socket.room).emit('chat',  msg, username );
+        socket.broadcast.to(socket.room).emit('chat',  msg, username, Date.now() );
     });
 
     socket.on('sendchat', function(data){
