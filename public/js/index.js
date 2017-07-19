@@ -27,11 +27,15 @@ socket.on('connect', function() {
 });
 
 
-socket.on('chat', function ( msg, username, time) {
+socket.on('chat', function ( msg, username, time, room) {
+
     $('#roomname').empty();
-    $('#roomname').append('<p>room1</p>');
+   if(!room){
+       room = 'room1';
+   }
+    $('#roomname').append('<p>' + room + '</p>');
     $.ajax(
-        {url: "/retrieveMessagesForRoom?room=room1",
+        {url: "/retrieveMessagesForRoom?room=" + room,
             dataType: 'json',
             success: function(result){
                 $('#messages').empty();
@@ -54,8 +58,7 @@ socket.on('chat', function ( msg, username, time) {
 
 
 socket.on('addedUser', function (username, room) {
-    $('#userjoined').empty();
-    $('#userjoined').append($('<p>').text(  username + ' has connected to ' +  room));
+    $('#username').append($('<p>').text(  username + ' has connected to ' +  room));
 });
 
 socket.on('updaterooms', function(rooms, current_room){
@@ -75,7 +78,9 @@ socket.on('updateusers', function(usernames){
     // code for showing the current users.
 });
 
-
+socket.on('updatechat', function(data, username){
+    $('#messages').append('<b>' + username + ':</b> '+ msg + '<br>');
+})
 
 function switchRoom(room){
     $('#roomname').empty();

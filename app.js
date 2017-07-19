@@ -140,7 +140,6 @@ io.on('connection', function(socket){
         mongo.connect(process.env.CUSTOMCONNSTR_MONGOLAB_URI, function(err, db){
             var collection = db.collection('chat_messages');
             var stream = collection.find().sort().limit(10).stream();
-            console.log('Current room in chat ', socket.room);
 
             collection.insert({'content': msg, 'user': socket.request.user.username, 'time': Date.now(), 'room': socket.room }, function(err, o){
                 if(err) {
@@ -154,7 +153,7 @@ io.on('connection', function(socket){
         });
        // socket.broadcast.emit('chat',  msg);
         var username = socket.request.user.username;
-        socket.broadcast.to(socket.room).emit('chat',  msg, username, Date.now() );
+        socket.broadcast.to(socket.room).emit('chat',  msg, username, Date.now(), socket.room );
     });
 
     socket.on('sendchat', function(data){
