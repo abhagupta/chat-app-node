@@ -19,3 +19,5 @@ npm start
 ```
 
 Browse to `http://localhost:<port number>`. If no PORT is set, 8000 is default port.
+
+Deployed Heroku app : https://multiroom-chat-app.herokuapp.com/
