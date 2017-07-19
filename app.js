@@ -116,7 +116,6 @@ io.on('connection', function(socket){
     } );
 
     socket.on('switchRoom', function(newroom){
-        console.log('new room' , newroom);
         socket.room = newroom;
         socket.leave(socket.room);
         socket.join(newroom);
