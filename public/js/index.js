@@ -54,7 +54,8 @@ socket.on('chat', function ( msg, username, time) {
 
 
 socket.on('addedUser', function (username, room) {
-    $('#username').append($('<p>').text(  username + ' has connected to ' +  room));
+    $('#userjoined').empty();
+    $('#userjoined').append($('<p>').text(  username + ' has connected to ' +  room));
 });
 
 socket.on('updaterooms', function(rooms, current_room){
