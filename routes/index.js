@@ -58,12 +58,12 @@ module.exports =  function (app, passport) {
                     if (err) {
                         return res.send("User update room error: " + err);
                     }
-                    Room.findOne({'roomname': user_room}, function(err, room){
-                        if(err){
-                            return res.send("Room name update error: " + err);
-                        }
-                        Room.update({'_id': room._id}, {$push: {'users': req.user.username}})
-                    })
+                    // Room.findOne({'roomname': user_room}, function(err, room){
+                    //     if(err){
+                    //         return res.send("Room name update error: " + err);
+                    //     }
+                    //     Room.update({'_id': room._id}, {$push: {'users': req.user.username}})
+                    // })
 
                 });
             }
