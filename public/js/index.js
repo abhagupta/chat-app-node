@@ -1,6 +1,13 @@
 
 var socket = io();
 
+$(document).keypress(function(e) {
+    if (e.which == 13) {
+        $('#send-message-btn').trigger('click');
+    }
+});
+
+
 
 
 $('#send-message-btn').click(function () {
@@ -15,6 +22,7 @@ $('#send-message-btn').click(function () {
             '<div class="chat_time pull-right">' + moment().format("h:mm:ss a") + '</div>' +
             '</div>' +
          '</li>');
+        $('#messages ul').scrollTop($('#messages')[0].scrollHeight);
         $('#message-box').val('');
         return false;
     }
@@ -68,7 +76,7 @@ socket.on('updaterooms', function(rooms, current_room){
             $('#rooms').append('<li class="left clearfix" <span class="chat-img pull-left">' +
 
                 '</span><div class="chat-body clearfix">' +
-                '<div class="header_sec"> <strong class="primary-font"><a href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></strong> <strong class="pull-right">'+
+                '<div class="header_sec"> <strong class="primary-font"><a class="btn btn-info" role="button" href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></strong> <strong class="pull-right">'+
                 '</div></li>');
 
         });
@@ -85,6 +93,7 @@ socket.on('updatechat', function(data, username){
 function switchRoom(room){
     $('#roomname').empty();
     $('#roomname').append('<p>' + room + '</p>');
+
 
     // empty the messages
     // pull messages for this chat room from database by calling an ajax call

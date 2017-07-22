@@ -8,7 +8,8 @@ const passportSocketIo = require('passport.socketio');
 var flash = require('connect-flash');
 var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
-var user = require('./routes/user')
+var user = require('./routes/user');
+var config = require('./config');
 mongoose.connect(process.env.CUSTOMCONNSTR_MONGOLAB_URI, {
     useMongoClient: true
 

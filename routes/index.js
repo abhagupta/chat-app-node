@@ -1,4 +1,6 @@
 var Messages  = require('../models/messages');
+var Room = require('../models/room');
+var User = require('../models/user');
 
 module.exports =  function (app, passport) {
 
@@ -18,7 +20,14 @@ module.exports =  function (app, passport) {
 
     app.get('/login', function(req, res, next){
         res.render('login', { message: req.flash('loginMessage') });
-    })
+    });
+
+    app.post('/createRoom', function(req, res, next){
+        var room = new Room();
+        room.name = req.query.roomname;
+        room.user= req.user.username;
+
+    });
 
 
     app.post('/login', passport.authenticate('login', {
@@ -41,6 +50,24 @@ module.exports =  function (app, passport) {
         });
 
     app.get('/retrieveMessagesForRoom', function(req, res, next){
+
+        User.findOne({username: req.user.username}, function(err, user){
+            var user_room = req.query.room;
+            if (user.rooms.indexOf(user_room) < 0) {
+                User.update({'_id': user._id}, {$push: {'rooms': user_room}}, function (err, numAffected, rawResponse) {
+                    if (err) {
+                        return res.send("User update room error: " + err);
+                    }
+                    Room.findOne({'roomname': user_room}, function(err, room){
+                        if(err){
+                            return res.send("Room name update error: " + err);
+                        }
+                        Room.update({'_id': room._id}, {$push: {'users': req.user.username}})
+                    })
+
+                });
+            }
+        });
 
         Messages.find({"room": req.query.room}, function(err, data){
             res.setHeader('Content-Type', 'application/json');
