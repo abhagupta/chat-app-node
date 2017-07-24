@@ -7,6 +7,28 @@ $(document).keypress(function(e) {
     }
 });
 
+$(document).ready(function(e){
+    $.ajax({
+        url: '/retrieveChatRooms',
+        dataType: 'json',
+        success: function(rooms){
+            $('#rooms').empty();
+            $.each(rooms, function(key, value){
+
+                $('#rooms').append('<li class="left clearfix" <span class="chat-img pull-left">' +
+
+                    '</span><div class="chat-body clearfix">' +
+                    '<div class="header_sec"> <strong class="primary-font"><a class="btn btn-info" role="button" href="#" onclick="switchRoom(\''+value.roomname+'\')">' + value.roomname + '</a></strong> <strong class="pull-right">'+
+                    '</div></li>');
+
+            });
+        }
+    }
+    )
+
+
+});
+
 
 
 
@@ -66,21 +88,22 @@ socket.on('chat', function ( msg, username, time, room) {
 
 
 socket.on('addedUser', function (username, room) {
-    $('#username').append($('<p>').text(  username + ' has connected to ' +  room));
+    $('#userjoined').empty();
+    $('#userjoined').append($('<p>').text(  username + ' has connected to ' +  room));
 });
 
-socket.on('updaterooms', function(rooms, current_room){
-    $('#rooms').empty();
-    $.each(rooms, function(key, value){
-
-            $('#rooms').append('<li class="left clearfix" <span class="chat-img pull-left">' +
-
-                '</span><div class="chat-body clearfix">' +
-                '<div class="header_sec"> <strong class="primary-font"><a class="btn btn-info" role="button" href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></strong> <strong class="pull-right">'+
-                '</div></li>');
-
-        });
-    });
+// socket.on('updaterooms', function(rooms, current_room){
+//     $('#rooms').empty();
+//     $.each(rooms, function(key, value){
+//
+//             $('#rooms').append('<li class="left clearfix" <span class="chat-img pull-left">' +
+//
+//                 '</span><div class="chat-body clearfix">' +
+//                 '<div class="header_sec"> <strong class="primary-font"><a class="btn btn-info" role="button" href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></strong> <strong class="pull-right">'+
+//                 '</div></li>');
+//
+//         });
+//     });
 
 socket.on('updateusers', function(usernames){
     // code for showing the current users.
@@ -114,9 +137,26 @@ function switchRoom(room){
                      '</div>' +
                      '</li>');
              })
+             $.ajax({
+                 url: '/retrieveUsersInChatRooms?room='+room,
+                 dataType: 'json',
+                 success: function(users){
+                     $('#room_members').empty();
+                     var users_list =  $('#room_members').append('<ul></ul>').find('ul');
+                     users.forEach(function(user){
+                         users_list.append('<li class="user_list">' + user + '</li>');
+                     });
+                 }
+             });
+
+             socket.join(room);
          }
         }
      );
+
+
+
+
 
     socket.emit('switchRoom', room);
 }

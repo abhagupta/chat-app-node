@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 
 var roomSchema = mongoose.Schema({
-    room: String,
+    roomname: String,
+    createdBy: String,
     users: [String]
 
 });

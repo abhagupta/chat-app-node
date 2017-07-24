@@ -20,6 +20,16 @@
                         <div class="input-group col-md-12">
                            <h3>Rooms</h3>
                         </div>
+
+                        <form action="/createRoom" method="post">
+                            <div class="form-group">
+                                <label for="createRoom">Create Room</label>
+                                <input type="text" class="form-control" name="roomname" id="createRoom" placeholder="Enter room name">
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+
                     </div>
 
                     <div class="member_list">
@@ -30,10 +40,12 @@
             <!--chat_sidebar-->
 
 
-            <div class="col-sm-9 message_section">
+            <div class="col-sm-6 message_section">
                 <div class="row">
                     <div class="new_message_head">
-                        <div id="roomname" class="pull-left"></div><div class="pull-right"><p>Welcome <%= username%> </p><a href="/logout">Logout</a></div>
+                        <div id="roomname" class="pull-left"></div>
+                        <div class="pull-right"><p>Welcome <%= username%> </p><a href="/logout">Logout</a></div>
+
                     </div><!--new_message_head-->
 
                     <div class="chat_area" id="messages">
@@ -48,10 +60,16 @@
                         <div class="clearfix"></div>
 
                             <a href="#" class="pull-right btn btn-success" id="send-message-btn">
-                                Send</a></div>
+                                Send</a>
                     </div>
+
                 </div>
+
             </div> <!--message_section-->
+            <div class="col-sm-3 message_section">
+                <div id="room_members" ><strong>Members in this room</strong></div>
+            </div>
+
         </div>
     </div>
 </div>

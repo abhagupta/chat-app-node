@@ -116,6 +116,7 @@ io.on('connection', function(socket){
     } );
 
     socket.on('switchRoom', function(newroom){
+        console.log('new room', newroom);
         socket.room = newroom;
         socket.leave(socket.room);
         socket.join(newroom);
@@ -123,12 +124,23 @@ io.on('connection', function(socket){
         socket.broadcast.to(newroom).emit('addedUser',  socket.request.user.username, newroom);
         //send message to old room
         socket.broadcast.to(socket.room);
-    })
+    });
+
+    socket.on('leave', function() {
+        Room.findOne({roomname: socket.room}, function(err, result){
+            if(err){
+                return res.send(err);
+            } else {
+                Room.update( {roomname: socket.room}, { $pullAll: {users: [socket.request.user.username] } } )
+            }
+        })
+    });
 
 
 
     socket.on('disconnect', function () {
         console.log('user disconnected');
+        socket.leave(socket.room);
         delete usernames[socket.request.user.username];
        socket.emit('updateusers', usernames);
 
