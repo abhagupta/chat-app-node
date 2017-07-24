@@ -53,7 +53,7 @@ $('#send-message-btn').click(function () {
 
 socket.on('connect', function() {
     socket.emit('create', 'business');
-    socket.emit('adduser');
+    //socket.emit('adduser');
 });
 
 
@@ -61,7 +61,7 @@ socket.on('chat', function ( msg, username, time, room) {
 
     $('#roomname').empty();
    if(!room){
-       room = 'room1';
+       room = 'default';
    }
     $('#roomname').append('<p>' + room + '</p>');
     $.ajax(
@@ -92,18 +92,6 @@ socket.on('addedUser', function (username, room) {
     $('#userjoined').append($('<p>').text(  username + ' has connected to ' +  room));
 });
 
-// socket.on('updaterooms', function(rooms, current_room){
-//     $('#rooms').empty();
-//     $.each(rooms, function(key, value){
-//
-//             $('#rooms').append('<li class="left clearfix" <span class="chat-img pull-left">' +
-//
-//                 '</span><div class="chat-body clearfix">' +
-//                 '<div class="header_sec"> <strong class="primary-font"><a class="btn btn-info" role="button" href="#" onclick="switchRoom(\''+value+'\')">' + value + '</a></strong> <strong class="pull-right">'+
-//                 '</div></li>');
-//
-//         });
-//     });
 
 socket.on('updateusers', function(usernames){
     // code for showing the current users.
