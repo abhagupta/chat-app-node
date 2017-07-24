@@ -44,7 +44,6 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(checkAuth);
 
 
 require('./routes')(app, passport);
@@ -177,19 +176,6 @@ io.on('connection', function(socket){
 });
 
 
-function checkAuth (req, res, next) {
-    //console.log('checkAuth ' + req.url);
-
-    // don't serve /secure to those not logged in
-    // you should add to this list, for each and every secure url
-    if (req.url === '/secure' && (!req.session || !req.session.authenticated)) {
-
-        res.render('unauthorized', { status: 403 });
-        return;
-    }
-
-    next();
-}
 
 
 
