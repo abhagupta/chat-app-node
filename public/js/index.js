@@ -7,12 +7,14 @@ $(document).keypress(function(e) {
     }
 });
 
+var defaultRoom;
 $(document).ready(function(e){
     $.ajax({
         url: '/retrieveChatRooms',
         dataType: 'json',
         success: function(rooms){
             $('#rooms').empty();
+            defaultRoom = rooms[0];
             $.each(rooms, function(key, value){
 
                 $('#rooms').append('<li class="left clearfix" <span class="chat-img pull-left">' +
@@ -61,7 +63,7 @@ socket.on('chat', function ( msg, username, time, room) {
 
     $('#roomname').empty();
    if(!room){
-       room = 'default';
+       room = defaultRoom.roomname;
    }
     $('#roomname').append('<p>' + room + '</p>');
     $.ajax(
@@ -80,7 +82,18 @@ socket.on('chat', function ( msg, username, time, room) {
                         '<div class="chat_time pull-right">' + moment(message.time).format("dddd, MMMM Do YYYY, h:mm:ss a") + '</div>' +
                         '</div>' +
                         '</li>');
-                })
+                });
+                $.ajax({
+                    url: '/retrieveUsersInChatRooms?room='+room,
+                    dataType: 'json',
+                    success: function(users){
+                        $('#room_members').empty();
+                        var users_list =  $('#room_members').append('<ul></ul>').find('ul');
+                        users.forEach(function(user){
+                            users_list.append('<li class="user_list">' + user + '</li>');
+                        });
+                    }
+                });
             }
         }
     );
@@ -104,19 +117,22 @@ socket.on('addedUser', function (username, room) {
 });
 
 socket.on('userleft', function(username, room){
-    $('#userjoined').empty();
-    $('#userjoined').append($('<p>').text(  username + ' left ' +  room));
-    $.ajax({
-        url: '/retrieveUsersInChatRooms?room='+room,
-        dataType: 'json',
-        success: function(users){
-            $('#room_members').empty();
-            var users_list =  $('#room_members').append('<ul></ul>').find('ul');
-            users.forEach(function(user){
-                users_list.append('<li class="user_list">' + user + '</li>');
-            });
-        }
-    });
+    if(!room) {
+        $('#userjoined').empty();
+        $('#userjoined').append($('<p>').text(username + ' left ' + room));
+
+        $.ajax({
+            url: '/retrieveUsersInChatRooms?room=' + room,
+            dataType: 'json',
+            success: function (users) {
+                $('#room_members').empty();
+                var users_list = $('#room_members').append('<ul></ul>').find('ul');
+                users.forEach(function (user) {
+                    users_list.append('<li class="user_list">' + user + '</li>');
+                });
+            }
+        });
+    }
 });
 
 
