@@ -134,7 +134,7 @@ module.exports =  function (app, passport) {
             if(err){
                 return res.send("Error thrown while retrieving users for room",  err);
             }
-            if(!data ){
+            if(data){
                 res.send(data.users);
             }
 
