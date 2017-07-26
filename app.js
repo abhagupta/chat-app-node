@@ -8,7 +8,8 @@ const passportSocketIo = require('passport.socketio');
 var flash = require('connect-flash');
 var mongo = require('mongodb').MongoClient;
 var mongoose = require('mongoose');
-var user = require('./routes/user');
+var User = require('./models/user');
+var Room = require('./models/room');
 mongoose.connect(process.env.CUSTOMCONNSTR_MONGOLAB_URI, {
     useMongoClient: true
 
@@ -79,9 +80,6 @@ io.use(passportSocketIo.authorize({
 // usernames which are currently connected to the chat
 var usernames = {};
 
-// rooms which are currently available in chat
-var rooms = ['room1','room2','room3'];
-
 io.on('connection', function(socket){
     console.log('user', socket.request.user.username + ' has connected');
 
@@ -95,25 +93,6 @@ io.on('connection', function(socket){
 
     });
 
-    socket.on('adduser', function(){
-
-        var username = socket.request.user.username;
-        socket.username = socket.request.user.username;
-        socket.room = 'room1';
-        usernames[username] = socket.username;
-        socket.join('room1');
-
-        socket.emit('addedUser', socket.request.user.username,  socket.room);
-        socket.broadcast.to('room1').emit('addedUser',  socket.request.user.username, socket.room);
-
-       // socket.emit('updatechat', socket.request.user.username,  socket.room);
-       // socket.broadcast.to('room1').emit('addedUser',  socket.request.user.username, socket.room);
-        socket.emit('updaterooms', rooms, 'room1');
-
-
-       // socket.broadcast.emit('updatechat', socket.request.user.username + ' has connected');
-    } );
-
     socket.on('switchRoom', function(newroom){
         console.log('new room', newroom);
         socket.room = newroom;
@@ -125,29 +104,16 @@ io.on('connection', function(socket){
         socket.broadcast.to(socket.room);
     });
 
-    socket.on('leave', function() {
-        Room.findOne({roomname: socket.room}, function(err, result){
-            if(err){
-                return res.send(err);
-            } else {
-                Room.update( {roomname: socket.room}, { $pullAll: {users: [socket.request.user.username] } } )
-            }
-        })
-    });
-
-
-
     socket.on('disconnect', function () {
-        console.log('user disconnected');
+        console.log('user ' + socket.request.user.username +  ' disconnected from ',   socket.room);
+        leaveRooms(socket.request.user.username, socket);
         socket.leave(socket.room);
         delete usernames[socket.request.user.username];
        socket.emit('updateusers', usernames);
 
     });
 
-
     socket.on('chat', function (msg) {
-
         mongo.connect(process.env.CUSTOMCONNSTR_MONGOLAB_URI, function(err, db){
             var collection = db.collection('chat_messages');
             var stream = collection.find().sort().limit(10).stream();
@@ -160,7 +126,6 @@ io.on('connection', function(socket){
                 }
             });
 
-
         });
        // socket.broadcast.emit('chat',  msg);
         var username = socket.request.user.username;
@@ -169,11 +134,34 @@ io.on('connection', function(socket){
 
     socket.on('sendchat', function(data){
         socket.in(socket.room).emit('updatechat',  data, socket.request.user.username);
-    })
-
-
+    });
 
 });
+
+function leaveRooms(user, socket){
+    User.findOne({username: user}, function(err, data){
+        if(err){
+            console.warn(err.message);
+        } else {
+            User.update({username: user}, {$set: {rooms:[]}}, function(err, val){
+                if(err){
+                    console.warn(err.message);
+                } else {
+                    Room.update({roomname: socket.room}, {$pull: {users: user}}, function(err, val){
+                        if(err){
+                            console.warn(err.message);
+                        } else {
+                            console.log("User " + user + " removed from " + socket.room);
+                        }
+                    })
+                }
+            });
+
+        }
+    });
+
+}
+
 
 
 
