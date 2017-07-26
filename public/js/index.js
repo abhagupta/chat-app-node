@@ -7,16 +7,13 @@ $(document).keypress(function(e) {
     }
 });
 
-var defaultRoom = 'default';
 $(document).ready(function(e){
     $.ajax({
         url: '/retrieveChatRooms',
         dataType: 'json',
         success: function(rooms){
             $('#rooms').empty();
-            // if(rooms.length > 0){
-            //     defaultRoom = rooms[0].roomname;
-            // }
+
 
             $.each(rooms, function(key, value){
 
