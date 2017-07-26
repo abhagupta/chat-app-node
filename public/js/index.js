@@ -7,14 +7,17 @@ $(document).keypress(function(e) {
     }
 });
 
-var defaultRoom;
+var defaultRoom = 'default';
 $(document).ready(function(e){
     $.ajax({
         url: '/retrieveChatRooms',
         dataType: 'json',
         success: function(rooms){
             $('#rooms').empty();
-            defaultRoom = rooms[0];
+            if(rooms.length > 0){
+                defaultRoom = rooms[0].roomname;
+            }
+
             $.each(rooms, function(key, value){
 
                 $('#rooms').append('<li class="left clearfix" <span class="chat-img pull-left">' +
@@ -63,7 +66,7 @@ socket.on('chat', function ( msg, username, time, room) {
 
     $('#roomname').empty();
    if(!room){
-       room = defaultRoom.roomname;
+       room = defaultRoom;
    }
     $('#roomname').append('<p>' + room + '</p>');
     $.ajax(
