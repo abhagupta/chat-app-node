@@ -14,9 +14,9 @@ $(document).ready(function(e){
         dataType: 'json',
         success: function(rooms){
             $('#rooms').empty();
-            if(rooms.length > 0){
-                defaultRoom = rooms[0].roomname;
-            }
+            // if(rooms.length > 0){
+            //     defaultRoom = rooms[0].roomname;
+            // }
 
             $.each(rooms, function(key, value){
 
@@ -66,7 +66,7 @@ socket.on('chat', function ( msg, username, time, room) {
 
     $('#roomname').empty();
    if(!room){
-       room = defaultRoom;
+       room = 'default';
    }
     $('#roomname').append('<p>' + room + '</p>');
     $.ajax(
@@ -86,17 +86,17 @@ socket.on('chat', function ( msg, username, time, room) {
                         '</div>' +
                         '</li>');
                 });
-                $.ajax({
-                    url: '/retrieveUsersInChatRooms?room='+room,
-                    dataType: 'json',
-                    success: function(users){
-                        $('#room_members').empty();
-                        var users_list =  $('#room_members').append('<ul></ul>').find('ul');
-                        users.forEach(function(user){
-                            users_list.append('<li class="user_list">' + user + '</li>');
-                        });
-                    }
-                });
+                // $.ajax({
+                //     url: '/retrieveUsersInChatRooms?room='+room,
+                //     dataType: 'json',
+                //     success: function(users){
+                //         $('#room_members').empty();
+                //         var users_list =  $('#room_members').append('<ul></ul>').find('ul');
+                //         users.forEach(function(user){
+                //             users_list.append('<li class="user_list">' + user + '</li>');
+                //         });
+                //     }
+                // });
             }
         }
     );
