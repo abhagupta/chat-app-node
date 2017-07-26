@@ -159,6 +159,7 @@ function leaveRooms(user, socket){
 
         }
     });
+   socket.in(socket.room).emit('userleft',   user, socket.room);
 
 }
 

@@ -90,11 +90,40 @@ socket.on('chat', function ( msg, username, time, room) {
 socket.on('addedUser', function (username, room) {
     $('#userjoined').empty();
     $('#userjoined').append($('<p>').text(  username + ' has connected to ' +  room));
+    $.ajax({
+        url: '/retrieveUsersInChatRooms?room='+room,
+        dataType: 'json',
+        success: function(users){
+            $('#room_members').empty();
+            var users_list =  $('#room_members').append('<ul></ul>').find('ul');
+            users.forEach(function(user){
+                users_list.append('<li class="user_list">' + user + '</li>');
+            });
+        }
+    });
 });
+
+socket.on('userleft', function(username, room){
+    $('#userjoined').empty();
+    $('#userjoined').append($('<p>').text(  username + ' left ' +  room));
+    $.ajax({
+        url: '/retrieveUsersInChatRooms?room='+room,
+        dataType: 'json',
+        success: function(users){
+            $('#room_members').empty();
+            var users_list =  $('#room_members').append('<ul></ul>').find('ul');
+            users.forEach(function(user){
+                users_list.append('<li class="user_list">' + user + '</li>');
+            });
+        }
+    });
+});
+
 
 
 socket.on('updateusers', function(usernames){
     // code for showing the current users.
+    console.log("update users called");
 });
 
 socket.on('updatechat', function(data, username){
@@ -137,7 +166,7 @@ function switchRoom(room){
                  }
              });
 
-             socket.join(room);
+             // socket.join(room);
          }
         }
      );
